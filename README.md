@@ -1,360 +1,196 @@
-# seosong_sistema-de-musica-
-É um sistema de playlist de musica 
+# Seosong - Sistema de Playlist de Música
 
-Funcionalidades do sistema:
-- buscador de musicas(filtragem simples, mais podemos decidir) 
-- favoritos 
-- playliste 
-- cadastro de usuario 
-- adicionar musica
-
-Entidades do sistema:
-- usuario 
-- musica 
-- artista 
-- album 
-- playliste 
-- favorito ( favorito user_musica )
-  
-
-Modelagem do banco de dados:
-creat
-updet
-
-Usuario 
-- id 
-- email 
-- senha 
-- nome 
-- data de nascimento
-- cep 
-- foto 
-
-Musica
-- id 
-- id_artista
-- album
-- ano 
-- duração 
-- genero 
-- nome_musica
-- foto 
-
-solo/banda
-Artista
-- id 
-- nome_artista 
-- descrição 
-- data_formação 
-- foto 
-
-Playliste
-- id 
-- nome_playliste
-- user_id
-- foto 
-
-
-# Documentação do Projeto #
-
-# Projeto Seosong Integrado V2
-
-## Documentação Técnica do Sistema
-
-**Versão:** 2.0
-**Nome do Projeto:** Seosong Integrado V2
+**Slogan:** Sua trilha. Seu momento.  
+**Versão:** 2.0  
 **Tipo de Sistema:** Plataforma Web para Gerenciamento e Reprodução de Músicas
 
 ---
 
-# 1. Visão Geral
+## 1. Visão Geral
 
-O **Seosong Integrado V2** é um sistema de gerenciamento de músicas que permite aos usuários pesquisar músicas, criar playlists, favoritar músicas e gerenciar seu perfil.
-
-O objetivo do projeto é oferecer uma plataforma simples, organizada e intuitiva para armazenamento e organização de músicas.
+O **Seosong Integrado V2** é um sistema de gerenciamento de músicas que permite aos usuários pesquisar músicas, criar playlists, favoritar músicas e gerenciar seu perfil. O objetivo do projeto é oferecer uma plataforma simples, organizada e intuitiva para armazenamento e organização de músicas.
 
 ---
 
-# 2. Objetivos
+## 2. Objetivos
 
-* Organizar músicas em um banco de dados.
-* Permitir pesquisas rápidas.
-* Gerenciar usuários.
-* Criar playlists personalizadas.
-* Favoritar músicas.
-* Cadastrar artistas, álbuns e músicas.
+- Organizar músicas em um banco de dados.
+- Permitir pesquisas rápidas por músicas, artistas e gêneros.
+- Gerenciar usuários com autenticação.
+- Criar playlists personalizadas.
+- Favoritar músicas.
+- Cadastrar artistas e músicas.
 
 ---
 
-# 3. Funcionalidades
+## 3. Funcionalidades do Sistema
 
-## 3.1 Cadastro de Usuários
-
+### 3.1 Cadastro de Usuários
 Permite criar contas para acesso ao sistema.
 
-### Funcionalidades
+- Cadastro
+- Login
+- Alteração de dados
+- Atualização de foto
+- Recuperação de senha (futura implementação)
 
-* Cadastro
-* Login
-* Alteração de dados
-* Atualização de foto
-* Recuperação de senha (futura implementação)
+### 3.2 Buscador de Músicas
+Permite localizar músicas através de filtros simples.
 
----
+**Filtros disponíveis:**
+- Nome da música
+- Nome do artista
+- Gênero
+- Álbum
+- Ano
 
-## 3.2 Buscador de Músicas
-
-Permite localizar músicas através de filtros.
-
-### Filtros
-
-* Nome da música
-* Nome do artista
-* Gênero
-* Álbum
-* Ano
-
----
-
-## 3.3 Favoritos
-
+### 3.3 Favoritos
 Cada usuário pode adicionar músicas aos seus favoritos.
 
-Operações:
+- Adicionar favorito
+- Remover favorito
+- Listar favoritos
 
-* Adicionar favorito
-* Remover favorito
-* Listar favoritos
+### 3.4 Playlists
+Permite criar listas personalizadas de músicas.
 
----
+- Criar playlist
+- Editar playlist
+- Excluir playlist
+- Adicionar músicas
+- Remover músicas
 
-## 3.4 Playlists
+### 3.5 Cadastro de Músicas
+Permite cadastrar novas músicas contendo:
 
-Permite criar listas personalizadas.
+- Nome
+- Artista
+- Álbum (somente o nome, como texto)
+- Gênero
+- Ano
+- Duração
+- Foto
 
-Operações:
-
-* Criar playlist
-* Editar playlist
-* Excluir playlist
-* Adicionar músicas
-* Remover músicas
-
----
-
-## 3.5 Cadastro de Músicas
-
-Administradores poderão cadastrar músicas contendo:
-
-* Nome
-* Artista
-* Álbum
-* Gênero
-* Ano
-* Duração
-* Foto
-
----
-
-## 3.6 Cadastro de Artistas
-
+### 3.6 Cadastro de Artistas
 Permite registrar artistas ou bandas.
 
-Informações:
-
-* Nome
-* Descrição
-* Data de formação
-* Foto
+- Nome
+- Descrição
+- Data de formação
+- Foto
 
 ---
 
-## 3.7 Cadastro de Álbuns
+## 4. Requisitos Funcionais (RF)
 
-Cadastro dos álbuns relacionados aos artistas.
-
-Informações:
-
-* Nome
-* Artista
-* Ano de lançamento
-* Capa
-
----
-
-# 4. Requisitos Funcionais
-
-## RF01
-
-O sistema deve permitir cadastro de usuários.
-
-## RF02
-
-O sistema deve permitir login.
-
-## RF03
-
-O sistema deve permitir editar perfil.
-
-## RF04
-
-O sistema deve permitir cadastrar músicas.
-
-## RF05
-
-O sistema deve permitir cadastrar artistas.
-
-## RF06
-
-O sistema deve permitir cadastrar álbuns.
-
-## RF07
-
-O sistema deve permitir pesquisar músicas.
-
-## RF08
-
-O sistema deve permitir criar playlists.
-
-## RF09
-
-O sistema deve permitir adicionar músicas às playlists.
-
-## RF10
-
-O sistema deve permitir remover músicas das playlists.
-
-## RF11
-
-O sistema deve permitir favoritar músicas.
-
-## RF12
-
-O sistema deve listar os favoritos do usuário.
+| Código | Descrição |
+| :--- | :--- |
+| **RF01** | O sistema deve permitir cadastro de usuários. |
+| **RF02** | O sistema deve permitir login. |
+| **RF03** | O sistema deve permitir editar perfil. |
+| **RF04** | O sistema deve permitir cadastrar músicas. |
+| **RF05** | O sistema deve permitir cadastrar artistas. |
+| **RF06** | *(Removido - Álbum não é mais uma entidade)* |
+| **RF07** | O sistema deve permitir pesquisar músicas. |
+| **RF08** | O sistema deve permitir criar playlists. |
+| **RF09** | O sistema deve permitir adicionar músicas às playlists. |
+| **RF10** | O sistema deve permitir remover músicas das playlists. |
+| **RF11** | O sistema deve permitir favoritar músicas. |
+| **RF12** | O sistema deve listar os favoritos do usuário. |
 
 ---
 
-# 5. Requisitos Não Funcionais
+## 5. Requisitos Não Funcionais (RNF)
 
-* Interface responsiva
-* Banco de dados relacional
-* Sistema seguro
-* Criptografia de senhas
-* Upload de imagens
-* Boa performance nas pesquisas
-* Compatibilidade com dispositivos móveis
-
----
-
-# 6. Entidades do Sistema
-
-## Usuário
-
-Representa os usuários cadastrados.
-
-Atributos:
-
-* id
-* nome
-* email
-* senha
-* data_nascimento
-* cep
-* foto
+- Interface responsiva
+- Banco de dados relacional
+- Sistema seguro com criptografia de senhas
+- Upload de imagens
+- Boa performance nas pesquisas
+- Compatibilidade com dispositivos móveis
 
 ---
 
-## Música
+## 6. Entidades do Sistema
 
-Representa cada música cadastrada.
+### Usuário
+Representa uma pessoa cadastrada no Seosong.
 
-Atributos:
-
-* id
-* nome_musica
-* id_artista
-* id_album
-* genero
-* ano
-* duracao
-* foto
+- `id` (Identificador único)
+- `email` (E-mail)
+- `senha`
+- `nome`
+- `dataNascimento`
+- `cep`
+- `foto` (Avatar)
 
 ---
 
-## Artista
+### Música
+Representa uma música cadastrada no sistema.
 
-Representa artistas ou bandas.
-
-Atributos:
-
-* id
-* nome_artista
-* descricao
-* data_formacao
-* foto
-
----
-
-## Álbum
-
-Representa um álbum musical.
-
-Atributos:
-
-* id
-* nome_album
-* artista_id
-* ano_lancamento
-* capa
+- `id`
+- `nomeMusica` (Nome da música)
+- `artista` (Relacionamento com a entidade Artista)
+- `album` **(Atenção: agora é apenas um texto/String com o nome do álbum)**
+- `ano`
+- `duracao`
+- `genero`
+- `foto` (Capa da música)
 
 ---
 
-## Playlist
+### Artista
+Representa um artista solo ou uma banda.
 
-Lista personalizada criada por um usuário.
-
-Atributos:
-
-* id
-* nome_playlist
-* user_id
-* foto
+- `id`
+- `nomeArtista`
+- `descricao` (Biografia)
+- `dataFormacao`
+- `foto`
 
 ---
 
-## Favorito
+### Playlist
+Representa uma coleção de músicas criada por um usuário.
 
-Relaciona usuários e músicas favoritas.
-
-Atributos:
-
-* id
-* usuario_id
-* musica_id
+- `id`
+- `nomePlaylist`
+- `usuario` (Relacionamento com o dono da playlist)
+- `foto` (Capa da playlist)
 
 ---
 
-# 7. Modelagem do Banco de Dados
+### Favorito
+Entidade associativa que representa o relacionamento **N:N** entre **Usuário** e **Música**.
 
-## Tabela: Usuario
+- `id`
+- `usuario` (Quem favoritou)
+- `musica` (O que foi favoritado)
+
+---
+
+## 7. Modelagem do Banco de Dados
+
+### Tabela: `usuario`
 
 | Campo           | Tipo         |
 | --------------- | ------------ |
-| id              | INT          |
-| nome            | VARCHAR(100) |
+| id              | BIGINT (PK)  |
 | email           | VARCHAR(150) |
 | senha           | VARCHAR(255) |
+| nome            | VARCHAR(100) |
 | data_nascimento | DATE         |
 | cep             | VARCHAR(10)  |
 | foto            | VARCHAR(255) |
 
 ---
 
-## Tabela: Artista
+### Tabela: `artista`
 
 | Campo         | Tipo         |
 | ------------- | ------------ |
-| id            | INT          |
+| id            | BIGINT (PK)  |
 | nome_artista  | VARCHAR(150) |
 | descricao     | TEXT         |
 | data_formacao | DATE         |
@@ -362,218 +198,118 @@ Atributos:
 
 ---
 
-## Tabela: Album
-
-| Campo          | Tipo         |
-| -------------- | ------------ |
-| id             | INT          |
-| nome_album     | VARCHAR(150) |
-| artista_id     | INT          |
-| ano_lancamento | YEAR         |
-| capa           | VARCHAR(255) |
-
----
-
-## Tabela: Musica
+### Tabela: `musica`
 
 | Campo       | Tipo         |
 | ----------- | ------------ |
-| id          | INT          |
-| artista_id  | INT          |
-| album_id    | INT          |
+| id          | BIGINT (PK)  |
+| artista_id  | BIGINT (FK)  |
+| album       | VARCHAR(150) **(Agora é apenas texto)** |
 | nome_musica | VARCHAR(150) |
 | genero      | VARCHAR(50)  |
-| ano         | YEAR         |
+| ano         | INT          |
 | duracao     | TIME         |
 | foto        | VARCHAR(255) |
 
 ---
 
-## Tabela: Playlist
+### Tabela: `playlist`
 
 | Campo         | Tipo         |
 | ------------- | ------------ |
-| id            | INT          |
+| id            | BIGINT (PK)  |
 | nome_playlist | VARCHAR(100) |
-| usuario_id    | INT          |
+| usuario_id    | BIGINT (FK)  |
 | foto          | VARCHAR(255) |
 
 ---
 
-## Tabela: Playlist_Musica
-
-Tabela responsável pela relação N:N entre playlists e músicas.
+### Tabela: `playlist_musica`
+(Tabela de associação N:N entre Playlist e Música)
 
 | Campo       | Tipo |
 | ----------- | ---- |
-| playlist_id | INT  |
-| musica_id   | INT  |
+| playlist_id | BIGINT (FK) |
+| musica_id   | BIGINT (FK) |
+| *(PK composta)* | |
 
 ---
 
-## Tabela: Favorito
+### Tabela: `favorito`
 
 | Campo      | Tipo |
 | ---------- | ---- |
-| id         | INT  |
-| usuario_id | INT  |
-| musica_id  | INT  |
+| id         | BIGINT (PK) |
+| usuario_id | BIGINT (FK) |
+| musica_id  | BIGINT (FK) |
 
 ---
 
-# 8. Relacionamentos
+## 8. Relacionamentos e Cardinalidades
 
-* Um usuário pode criar várias playlists (1:N).
-* Uma playlist pode conter várias músicas (N:N).
-* Uma música pertence a um artista (N:1).
-* Um artista possui vários álbuns (1:N).
-* Um álbum possui várias músicas (1:N).
-* Um usuário pode favoritar várias músicas (N:N).
+- **Usuário (1) : Playlist (N)**  
+  Um usuário pode criar várias playlists. Uma playlist pertence a um único usuário.
 
----
+- **Artista (1) : Música (N)**  
+  Um artista pode ter várias músicas. Uma música pertence a um único artista.
 
-# 9. Operações CRUD
+- **Playlist (N) : Música (N)** *(via `playlist_musica`)*  
+  Uma playlist pode conter várias músicas. Uma música pode estar em várias playlists.
 
-## Usuário
+- **Usuário (N) : Música (N)** *(via `favorito`)*  
+  Um usuário pode favoritar várias músicas. Uma música pode ser favoritada por vários usuários.
 
-* Create
-* Read
-* Update
-* Delete
+**Obs.:** A entidade **Álbum** foi removida oficialmente do escopo. Agora, o álbum é apenas um atributo descritivo da música.
 
 ---
 
-## Música
+## 9. Operações CRUD
 
-* Create
-* Read
-* Update
-* Delete
-
----
-
-## Artista
-
-* Create
-* Read
-* Update
-* Delete
+| Entidade  | Create | Read | Update | Delete |
+| --------- | :----: | :--: | :----: | :----: |
+| Usuário   |   ✅   |  ✅  |   ✅   |   ✅   |
+| Música    |   ✅   |  ✅  |   ✅   |   ✅   |
+| Artista   |   ✅   |  ✅  |   ✅   |   ✅   |
+| Playlist  |   ✅   |  ✅  |   ✅   |   ✅   |
+| Favorito  |   ✅   |  ✅  |   ❌   |   ✅   |
 
 ---
 
-## Álbum
+## 10. Fluxo Geral do Sistema
 
-* Create
-* Read
-* Update
-* Delete
-
----
-
-## Playlist
-
-* Create
-* Read
-* Update
-* Delete
+1. O usuário realiza o cadastro.
+2. Efetua login na plataforma.
+3. Pesquisa músicas por nome, artista, gênero ou álbum.
+4. Visualiza os detalhes das músicas e artistas.
+5. Favorita suas músicas preferidas.
+6. Cria playlists personalizadas.
+7. Adiciona e remove músicas das playlists.
+8. Gerencia seus dados pessoais e foto de perfil.
 
 ---
 
-## Favoritos
+## 11. Tecnologias Sugeridas
 
-* Adicionar favorito
-* Listar favoritos
-* Remover favorito
+### Back-end
+- Java 17+
+- Spring Boot
+- Spring Data JPA (Hibernate)
+- API REST
+- Maven ou Gradle
 
----
+### Front-end
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap (para responsividade)
 
-# 10. Fluxo Geral do Sistema
+### Banco de Dados
+- PostgreSQL
 
-1. Usuário realiza cadastro.
-2. Efetua login.
-3. Pesquisa músicas.
-4. Visualiza artistas e álbuns.
-5. Favorita músicas.
-6. Cria playlists.
-7. Adiciona músicas às playlists.
-8. Gerencia seu perfil.
-
----
-
-# 11. Tecnologias Sugeridas
-
-## Front-end
-
-* HTML5
-* CSS3
-* JavaScript
-* Bootstrap ( Ele é um framework (um conjunto de ferramentas e códigos prontos) de front-end criado com as linguagens HTML, CSS e JavaScript)
-
-## Back-end
-
-* java
-* spring boot
-* API REST
-* 
-
-## Banco de Dados
-
-* PosgrelSQL
-
-## Controle de Versão
-
-* Git
-* GitHub
+### Controle de Versão
+- Git
+- GitHub
 
 ---
 
-# 12. Estrutura de Pastas (Sugestão)
-
-```
-seosong/
-
-├── assets/
-│   ├── css/
-│   ├── js/
-│   ├── img/
-│
-├── controllers/
-│
-├── models/
-│
-├── views/
-│
-├── routes/
-│
-├── database/
-│
-├── uploads/
-│
-├── config/
-│
-└── index.php
-```
-
----
-
-# 13. Melhorias Futuras
-
-* Reprodução de músicas em streaming.
-* Sistema de recomendações.
-* Histórico de reprodução.
-* Curtidas em playlists.
-* Compartilhamento de playlists.
-* Seguir artistas.
-* Comentários.
-* Aplicativo mobile.
-* Painel administrativo.
-* Upload de músicas.
-* Integração com Spotify e YouTube.
-* Busca avançada com múltiplos filtros.
-* Estatísticas de reprodução.
-
----
-
-# 14. Conclusão
-
-O **Seosong Integrado V2** é um sistema completo para gerenciamento de músicas, artistas, álbuns e playlists. Sua arquitetura foi planejada para ser escalável, permitindo futuras integrações e funcionalidades mais avançadas, como streaming, recomendações e APIs, mantendo uma estrutura organizada e preparada para crescimento.
+## 12. Estrutura de Pastas (Sugestão)
