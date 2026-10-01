@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist - SeoSong</title>
+
+    <link rel="stylesheet" href="app.css">
+    <script src="api.js"></script>
+    <script src="app-shell.js" defer></script>
+
+    <style>
+        .playlist-header {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .playlist-cover {
+            width: 84px;
+            height: 84px;
+            border-radius: 14px;
+            object-fit: cover;
+            background: var(--mint);
+            flex-shrink: 0;
+        }
+        .playlist-desc {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+            font-style: italic;
+        }
+        .add-song-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            margin-top: 18px;
+        }
+        .add-song-row select { flex: 1; }
+        .add-song-row button { white-space: nowrap; margin-top: 0; }
+        .section-title {
+            margin: 32px 0 14px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 17px;
+            color: var(--ink);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 18px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .back-link:hover { color: var(--green-dark); }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a id="backLink" href="listar.html" class="back-link">← Voltar</a>
+
+    <div class="card loading-line" id="playlistCard">
+        <span class="spinner"></span> Carregando playlist...
+    </div>
+
+</div>
+
+<script>
+
+    const params = new URLSearchParams(window.location.search);
+    const playlistId = params.get("id");
+    let backUserId = params.get("userId");
+
+    const playlistCard = document.getElementById("playlistCard");
+
+    function setBackLink(userId) {
+        if (!userId) return;
+        const link = document.getElementById("backLink");
+        link.href = `profile.html?id=${encodeURIComponent(userId)}`;
+        link.textContent = "← Voltar ao perfil";
+    }
+
+    setBackLink(backUserId);
+
+    let playlist = null;
+    let catalogo = [];
+
+    async function carregar() {
+        if (!playlistId) {
+            playlistCard.className = "card";
+            playlistCard.innerHTML = `<p class="empty-list">Playlist não informada.</p>`;
+            return;
+        }
+
+        try {
+            [playlist, catalogo] = await Promise.all([
+                apiFetch(`/playlists/${encodeURIComponent(playlistId)}`),
+                apiFetch("/songs")
+            ]);
+
+            // Sem ?userId= na URL, usa o dono que vem da API para o botão "Voltar".
+            if (!backUserId && playlist.userId) {
+                backUserId = playlist.userId;
+                setBackLink(backUserId);
+            }
+
+            render();
+
+        } catch (e) {
+            console.error(e);
+            playlistCard.className = "card";
+            playlistCard.innerHTML = `<p class="empty-list">Não foi possível carregar essa playlist: ${esc(e.message)}</p>`;
+        }
+    }
+
+    function render() {
+        playlistCard.className = "card";
+        const name = playlist.name || "Sem nome";
+        const photo = playlist.photo || placeholderPhoto(name);
+        const songs = playlist.songs || [];
+
+        const disponiveis = catalogo.filter(c => !songs.some(s => s.id === c.id));
+
+        playlistCard.innerHTML = `
+
+            <div class="playlist-header">
+                <img class="playlist-cover" src="${esc(photo)}" alt="${esc(name)}" data-fallback="${esc(placeholderPhoto(name))}">
+                <div>
+                    <h1 style="margin:0;">${esc(name)}</h1>
+                    ${playlist.description ? `<p class="playlist-desc">"${esc(playlist.description)}"</p>` : ""}
+                </div>
+            </div>
+
+            <button type="button" id="descBtn">✨ Gerar descrição com IA</button>
+            <div id="descResult" class="tool-result"></div>
+
+            <div class="section-title">Músicas (${songs.length})</div>
+
+            <div id="songGrid" class="card-grid">
+                ${songs.length === 0
+                    ? `<p class="empty-list">Essa playlist ainda não tem músicas.</p>`
+                    : songs.map(s => songCard(s, true)).join("")}
+            </div>
+
+            <div class="section-title">Adicionar música</div>
+
+            ${disponiveis.length === 0
+                ? `<p class="empty-list">${catalogo.length === 0 ? "Não há músicas cadastradas no catálogo." : "Todas as músicas do catálogo já estão nessa playlist."}</p>`
+                : `
+                    <div class="add-song-row">
+                        <select id="addSelect">
+                            ${disponiveis.map(s => `<option value="${esc(s.id)}">${esc(s.name || "Sem nome")}${s.artist ? " - " + esc(s.artist.name) : ""}</option>`).join("")}
+                        </select>
+                        <button type="button" id="addBtn">+ Adicionar</button>
+                    </div>
+                `}
+        `;
+
+        document.getElementById("descBtn").addEventListener("click", gerarDescricao);
+
+        const addBtn = document.getElementById("addBtn");
+        if (addBtn) addBtn.addEventListener("click", adicionarMusica);
+
+        document.querySelectorAll("[data-remove-song]").forEach(btn => {
+            btn.addEventListener("click", () => removerMusica(btn.dataset.removeSong, btn));
+        });
+    }
+
+    function songCard(song, comRemover) {
+        const name = song.name || "Sem nome";
+        const artistName = song.artist ? (song.artist.name || "Sem nome") : "Artista desconhecido";
+        const photo = song.photo || placeholderPhoto(name);
+
+        return `
+            <div class="item-card">
+                <img class="item-photo" src="${esc(photo)}" alt="${esc(name)}" data-fallback="${esc(placeholderPhoto(name))}">
+                <div>
+                    <div class="item-name">${esc(name)}</div>
+                    <div class="item-sub">${esc(artistName)}</div>
+                </div>
+                ${comRemover ? `<button type="button" class="item-action remove" data-remove-song="${esc(song.id)}" title="Remover da playlist">✕</button>` : ""}
+            </div>
+        `;
+    }
+
+    async function adicionarMusica() {
+        const select = document.getElementById("addSelect");
+        const songId = select.value;
+        const btn = document.getElementById("addBtn");
+
+        btn.disabled = true;
+        btn.textContent = "Adicionando...";
+
+        try {
+            playlist = await apiFetch(`/playlists/${playlistId}/songs/${songId}`, { method: "POST" });
+            render();
+        } catch (e) {
+            console.error(e);
+            alert("Não foi possível adicionar a música: " + e.message);
+            btn.disabled = false;
+            btn.textContent = "+ Adicionar";
+        }
+    }
+
+    async function removerMusica(songId, btn) {
+        btn.disabled = true;
+        btn.textContent = "...";
+
+        try {
+            playlist = await apiFetch(`/playlists/${playlistId}/songs/${songId}`, { method: "DELETE" });
+            render();
+        } catch (e) {
+            console.error(e);
+            alert("Não foi possível remover a música: " + e.message);
+            btn.disabled = false;
+            btn.textContent = "✕";
+        }
+    }
+
+    async function gerarDescricao() {
+        const btn = document.getElementById("descBtn");
+        const resultEl = document.getElementById("descResult");
+
+        btn.disabled = true;
+        btn.textContent = "Gerando...";
+        resultEl.className = "tool-result show loading";
+        resultEl.innerHTML = '<span class="spinner"></span> Pensando...';
+
+        try {
+            playlist = await apiFetch(`/llm/playlists/${playlistId}/description`, { method: "POST" });
+            resultEl.className = "tool-result";
+            render();
+        } catch (e) {
+            console.error(e);
+            resultEl.className = "tool-result show error";
+            resultEl.textContent = "Não foi possível gerar a descrição: " + e.message;
+        }
+
+        const btnDeNovo = document.getElementById("descBtn");
+        if (btnDeNovo) {
+            btnDeNovo.disabled = false;
+            btnDeNovo.textContent = "✨ Gerar descrição com IA";
+        }
+    }
+
+    carregar();
+</script>
+
+</body>
+
+</html>

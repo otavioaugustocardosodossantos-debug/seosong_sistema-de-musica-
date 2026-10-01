@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Perfil do Usuário</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: #f4f5f7;
+
+            color: #1f2937;
+
+        }
+
+
+        .container {
+
+            width: 100%;
+
+            max-width: 850px;
+
+            margin: 0 auto;
+
+            padding: 40px 24px;
+
+        }
+
+
+        /* HEADER */
+
+        .header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .title h1 {
+
+            margin: 0;
+
+            font-size: 30px;
+
+            color: #111827;
+
+        }
+
+
+        .title p {
+
+            margin: 6px 0 0;
+
+            color: #6b7280;
+
+        }
+
+
+        .back-button {
+
+            display: inline-block;
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            background: #111827;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            transition: background 0.2s;
+
+        }
+
+
+        .back-button:hover {
+
+            background: #374151;
+
+        }
+
+
+        /* PROFILE CARD */
+
+        .profile-card {
+
+            background: white;
+
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 3px 15px rgba(0, 0, 0, 0.06);
+
+        }
+
+
+        /* PROFILE HEADER */
+
+        .profile-header {
+
+            padding: 35px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 22px;
+
+            border-bottom: 1px solid #eeeeee;
+
+        }
+
+
+        .profile-photo {
+
+            width: 110px;
+
+            height: 110px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            background: #e5e7eb;
+
+            border: 4px solid #f3f4f6;
+
+        }
+
+
+        .profile-name {
+
+            margin: 0;
+
+            font-size: 25px;
+
+            color: #111827;
+
+        }
+
+
+        .profile-email {
+
+            margin-top: 7px;
+
+            color: #6b7280;
+
+        }
+
+
+        .profile-id {
+
+            display: inline-block;
+
+            margin-top: 12px;
+
+            padding: 5px 9px;
+
+            border-radius: 6px;
+
+            background: #f3f4f6;
+
+            color: #6b7280;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+        }
+
+
+        /* INFORMATION */
+
+        .information {
+
+            padding: 30px 35px;
+
+        }
+
+
+        .information h2 {
+
+            margin: 0 0 20px;
+
+            font-size: 18px;
+
+            color: #111827;
+
+        }
+
+
+        .information-grid {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 18px;
+
+        }
+
+
+        .info-item {
+
+            padding: 17px;
+
+            border: 1px solid #eeeeee;
+
+            border-radius: 10px;
+
+            background: #fafafa;
+
+        }
+
+
+        .info-label {
+
+            margin-bottom: 6px;
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            color: #9ca3af;
+
+            font-weight: 600;
+
+        }
+
+
+        .info-value {
+
+            font-size: 15px;
+
+            color: #374151;
+
+            font-weight: 500;
+
+        }
+
+
+        /* LOADING */
+
+        .loading {
+
+            padding: 80px 20px;
+
+            text-align: center;
+
+            color: #6b7280;
+
+        }
+
+
+        /* ERROR */
+
+        .error {
+
+            padding: 80px 20px;
+
+            text-align: center;
+
+            color: #dc2626;
+
+        }
+
+
+        .error strong {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 650px) {
+
+            .container {
+
+                padding: 25px 15px;
+
+            }
+
+
+            .header {
+
+                align-items: flex-start;
+
+                gap: 15px;
+
+            }
+
+
+            .title h1 {
+
+                font-size: 25px;
+
+            }
+
+
+            .profile-header {
+
+                padding: 25px;
+
+                flex-direction: column;
+
+                text-align: center;
+
+            }
+
+
+            .information {
+
+                padding: 25px;
+
+            }
+
+
+            .information-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="app.css">
+    <script src="api.js"></script>
+    <script src="app-shell.js" defer></script>
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="title">
+
+            <h1>Perfil do Usuário</h1>
+
+            <p>Informações cadastrais</p>
+
+        </div>
+
+
+        <a
+            href="listar.html"
+            class="back-button"
+        >
+            ← Voltar
+        </a>
+
+    </div>
+
+
+
+    <!-- PROFILE -->
+
+    <div
+        id="profile"
+        class="profile-card"
+    >
+
+        <div class="loading-line">
+
+            <span class="spinner"></span> Carregando perfil...
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+    const profile = document.getElementById("profile");
+
+    /*
+     * Pega o ID da URL.
+     * Exemplo: profile.html?id=1
+     */
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("id");
+
+
+    async function loadProfile() {
+
+        // Verifica se existe ID
+        if (!userId) {
+            showError("ID do usuário não informado.");
+            return;
+        }
+
+        try {
+
+            const user = await apiFetch(`/users/${encodeURIComponent(userId)}`);
+            renderProfile(user);
+
+        } catch (error) {
+
+            console.error(error);
+            showError(error.status === 404 ? "Usuário não encontrado." : error.message);
+        }
+    }
+
+
+    function renderProfile(user) {
+
+        const name = user.name || "Sem nome";
+        const email = user.email || "-";
+        const fallback = "https://ui-avatars.com/api/?name=" + encodeURIComponent(name);
+        const photo = user.photo || fallback;
+
+        profile.innerHTML = `
+
+            <!-- PROFILE HEADER -->
+
+            <div class="profile-header">
+
+                <img class="profile-photo" src="${esc(photo)}" alt="${esc(name)}" data-fallback="${esc(fallback)}">
+
+                <div>
+                    <h2 class="profile-name">${esc(name)}</h2>
+                    <div class="profile-email">${esc(email)}</div>
+                    <span class="profile-id">ID #${esc(user.id)}</span>
+                </div>
+
+            </div>
+
+
+            <!-- INFORMATION -->
+
+            <div class="information">
+
+                <h2>Informações pessoais</h2>
+
+                <div class="information-grid">
+
+                    <div class="info-item">
+                        <div class="info-label">Nome</div>
+                        <div class="info-value">${esc(name)}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">E-mail</div>
+                        <div class="info-value">${esc(email)}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Data de nascimento</div>
+                        <div class="info-value">${formatDate(user.birthDate)}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">CEP</div>
+                        <div class="info-value">${esc(user.zipCode || "-")}</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Foto</div>
+                        <div class="info-value">${esc(user.photo || "-")}</div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- PLAYLISTS -->
+
+            <div class="information" style="border-top: 1px solid var(--line); padding-top: 30px;">
+                <h2 style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                    Playlists
+                    <a class="app-nav-link primary" href="cadastro-playlist.html?userId=${encodeURIComponent(user.id)}">+ Nova playlist</a>
+                </h2>
+                <div id="playlistsGrid" class="card-grid">
+                    ${renderPlaylists(user.playlists)}
+                </div>
+            </div>
+
+
+            <!-- FAVORITAS -->
+
+            <div class="information" style="border-top: 1px solid var(--line); padding-top: 30px;">
+                <h2 style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                    Músicas favoritas
+                    <a class="app-nav-link primary" href="musicas.html?userId=${encodeURIComponent(user.id)}">♡ Favoritar músicas</a>
+                </h2>
+                <div id="favoritesGrid" class="card-grid">
+                    ${renderFavorites(user.favoriteSongs)}
+                </div>
+            </div>
+        `;
+
+        document.querySelectorAll("[data-unfavorite]").forEach(btn => {
+            btn.addEventListener("click", () => removerFavorito(btn.dataset.unfavorite, btn));
+        });
+    }
+
+
+    function renderPlaylists(playlists) {
+
+        if (!playlists || playlists.length === 0) {
+            return `<p class="empty-list">Esse usuário ainda não tem playlists. <a href="cadastro-playlist.html?userId=${encodeURIComponent(userId)}">Criar uma</a></p>`;
+        }
+
+        return playlists.map(playlist => {
+
+            const name = playlist.name || "Sem nome";
+            const photo = playlist.photo || placeholderPhoto(name);
+            const songCount = (playlist.songs || []).length;
+
+            return `
+                <a class="item-link" href="playlist.html?id=${encodeURIComponent(playlist.id)}&userId=${encodeURIComponent(userId)}">
+                    <div class="item-card">
+                        <img class="item-photo" src="${esc(photo)}" alt="${esc(name)}" data-fallback="${esc(placeholderPhoto(name))}">
+                        <div>
+                            <div class="item-name">${esc(name)}</div>
+                            <div class="item-sub">${songCount} música${songCount !== 1 ? "s" : ""}</div>
+                        </div>
+                    </div>
+                </a>
+            `;
+
+        }).join("");
+    }
+
+
+    const FAVORITES_EMPTY =
+        `<p class="empty-list">Esse usuário ainda não favoritou nenhuma música. <a href="musicas.html?userId=${encodeURIComponent(userId)}">Ver catálogo</a></p>`;
+
+    function renderFavorites(songs) {
+
+        if (!songs || songs.length === 0) {
+            return FAVORITES_EMPTY;
+        }
+
+        return songs.map(song => {
+
+            const name = song.name || "Sem nome";
+            const photo = song.photo || placeholderPhoto(name);
+            const artistName = song.artist ? (song.artist.name || "Sem nome") : "Artista desconhecido";
+
+            return `
+                <div class="item-card">
+                    <img class="item-photo" src="${esc(photo)}" alt="${esc(name)}" data-fallback="${esc(placeholderPhoto(name))}">
+                    <div>
+                        <div class="item-name">${esc(name)}</div>
+                        <div class="item-sub">${esc(artistName)}</div>
+                    </div>
+                    <button type="button" class="item-action active" data-unfavorite="${esc(song.id)}" title="Remover dos favoritos">♥</button>
+                </div>
+            `;
+
+        }).join("");
+    }
+
+
+    async function removerFavorito(songId, btn) {
+
+        btn.disabled = true;
+
+        try {
+            await apiFetch(`/users/${encodeURIComponent(userId)}/favorites/${songId}`, { method: "DELETE" });
+
+            const card = btn.closest(".item-card");
+            const grid = document.getElementById("favoritesGrid");
+            card.remove();
+
+            if (!grid.querySelector(".item-card")) {
+                grid.innerHTML = FAVORITES_EMPTY;
+            }
+
+        } catch (e) {
+            console.error(e);
+            alert("Não foi possível remover o favorito: " + e.message);
+            btn.disabled = false;
+        }
+    }
+
+
+    function showError(message) {
+
+        profile.innerHTML = `
+            <div class="error">
+                <strong>Não foi possível carregar o perfil.</strong>
+                <span>${esc(message)}</span>
+                <br><br>
+                <a href="listar.html" class="back-button">Voltar para usuários</a>
+            </div>
+        `;
+    }
+
+
+    // Carrega o perfil
+    loadProfile();
+</script>
+
+
+</body>
+
+</html>

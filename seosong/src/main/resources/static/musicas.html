@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Músicas - SeoSong</title>
+
+    <link rel="stylesheet" href="app.css">
+    <script src="api.js"></script>
+    <script src="app-shell.js" defer></script>
+    <style>
+        .fav-status { font-size: 13px; color: var(--muted, #6b7280); }
+        .fav-status a { font-weight: 600; }
+        .fav-toast {
+            position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+            background: #111827; color: #fff; padding: 10px 16px; border-radius: 10px;
+            font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+            max-width: calc(100% - 32px); z-index: 50;
+        }
+        .fav-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .fav-toast.error { background: #b91c1c; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="page-kicker">🎵 Catálogo</div>
+
+    <div class="header">
+        <h1>Músicas</h1>
+        <p>Escolha um usuário e clique no ♡ para favoritar. Os favoritos aparecem no perfil desse usuário.</p>
+    </div>
+
+    <div class="card">
+
+        <div class="user-picker">
+            <label for="currentUser">Favoritando como:</label>
+            <select id="currentUser"></select>
+            <span id="favStatus" class="fav-status"></span>
+            <a href="cadastro-musica.html" class="app-nav-link primary" style="margin-left:auto;">+ Nova música</a>
+        </div>
+
+        <div id="songGrid" class="loading-line">
+            <span class="spinner"></span> Carregando músicas...
+        </div>
+
+    </div>
+
+</div>
+
+<div id="favToast" class="fav-toast" role="status" aria-live="polite"></div>
+
+<script>
+
+    const STORAGE_KEY = "seosong_currentUser";
+
+    const userSelect = document.getElementById("currentUser");
+    const songGrid = document.getElementById("songGrid");
+    const favStatus = document.getElementById("favStatus");
+    const toast = document.getElementById("favToast");
+
+    let usuarios = [];
+    let musicas = [];
+    let favoritosIds = new Set();
+    let toastTimer = null;
+
+    function lerUsuarioSalvo() {
+        try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+    }
+
+    function salvarUsuario(id) {
+        try { localStorage.setItem(STORAGE_KEY, id); } catch (e) { /* navegador bloqueou o storage */ }
+    }
+
+    function mostrarToast(texto, erro) {
+        toast.textContent = texto;
+        toast.className = "fav-toast show" + (erro ? " error" : "");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.className = "fav-toast"; }, 2500);
+    }
+
+    function usuarioAtual() {
+        return usuarios.find(u => String(u.id) === userSelect.value) || null;
+    }
+
+    // "OTAVIO tem 3 favoritas · ver perfil"
+    function atualizarStatus() {
+        const user = usuarioAtual();
+        if (!user) {
+            favStatus.innerHTML = "";
+            return;
+        }
+        const n = favoritosIds.size;
+        favStatus.innerHTML =
+            `${esc(user.name || "Sem nome")} tem <strong>${n}</strong> favorita${n !== 1 ? "s" : ""} · ` +
+            `<a href="profile.html?id=${encodeURIComponent(user.id)}">ver perfil</a>`;
+    }
+
+    async function carregarUsuarios() {
+        usuarios = await apiFetch("/users");
+
+        if (usuarios.length === 0) {
+            userSelect.innerHTML = `<option value="">Nenhum usuário cadastrado</option>`;
+            userSelect.disabled = true;
+            return;
+        }
+
+        userSelect.innerHTML = usuarios
+            .map(u => `<option value="${esc(u.id)}">${esc(u.name || "Sem nome")} (#${esc(u.id)})</option>`)
+            .join("");
+
+        // Prioridade: ?userId= na URL (link do perfil) → último usuário usado → primeiro da lista
+        const daUrl = new URLSearchParams(location.search).get("userId");
+        const salvo = lerUsuarioSalvo();
+        const escolhido = [daUrl, salvo].find(id => id && usuarios.some(u => String(u.id) === id));
+        if (escolhido) userSelect.value = escolhido;
+        salvarUsuario(userSelect.value);
+    }
+
+    // Busca os favoritos direto do servidor (fonte da verdade)
+    async function carregarFavoritosDoUsuario() {
+        const userId = userSelect.value;
+        favoritosIds = new Set();
+        if (!userId) return;
+
+        try {
+            const user = await apiFetch(`/users/${userId}`);
+            favoritosIds = new Set((user.favoriteSongs || []).map(s => s.id));
+        } catch (e) {
+            console.error("Erro ao carregar favoritos do usuário", e);
+            mostrarToast("Não foi possível carregar os favoritos: " + e.message, true);
+        }
+    }
+
+    function renderMusicas() {
+        atualizarStatus();
+        songGrid.className = "card-grid";
+
+        if (musicas.length === 0) {
+            songGrid.innerHTML = `<p class="empty-list">Nenhuma música cadastrada ainda.</p>`;
+            return;
+        }
+
+        songGrid.innerHTML = musicas.map(song => {
+            const name = song.name || "Sem nome";
+            const artistName = song.artist ? (song.artist.name || "Sem nome") : "Artista desconhecido";
+            const photo = song.photo || placeholderPhoto(name);
+            const isFav = favoritosIds.has(song.id);
+
+            return `
+                <div class="item-card">
+                    <img class="item-photo" src="${esc(photo)}" alt="${esc(name)}" data-fallback="${esc(placeholderPhoto(name))}">
+                    <div>
+                        <div class="item-name">${esc(name)}</div>
+                        <div class="item-sub">${esc(artistName)}${song.genre ? " · " + esc(song.genre) : ""}</div>
+                    </div>
+                    <button
+                        type="button"
+                        class="item-action ${isFav ? "active" : ""}"
+                        data-song-id="${esc(song.id)}"
+                        title="${isFav ? "Remover dos favoritos" : "Favoritar"}"
+                        aria-pressed="${isFav}"
+                        ${!userSelect.value ? "disabled" : ""}
+                    >${isFav ? "♥" : "♡"}</button>
+                </div>
+            `;
+        }).join("");
+
+        songGrid.querySelectorAll(".item-action").forEach(btn => {
+            btn.addEventListener("click", () => toggleFavorito(btn));
+        });
+    }
+
+    async function toggleFavorito(btn) {
+        const userId = userSelect.value;
+        const songId = Number(btn.dataset.songId);
+        if (!userId || btn.disabled) return;
+
+        // Decide pelo estado real (Set), não pela aparência do botão
+        const jaFavoritado = favoritosIds.has(songId);
+        const song = musicas.find(s => s.id === songId);
+        const nome = song ? song.name : "Música";
+
+        btn.disabled = true;
+
+        try {
+            const user = await apiFetch(`/users/${userId}/favorites/${songId}`, {
+                method: jaFavoritado ? "DELETE" : "POST"
+            });
+
+            // O servidor devolve o usuário atualizado: usa a lista dele em vez de "adivinhar"
+            favoritosIds = new Set((user.favoriteSongs || []).map(s => s.id));
+            renderMusicas();
+
+            const dono = (usuarioAtual() || {}).name || "usuário";
+            mostrarToast(favoritosIds.has(songId)
+                ? `♥ "${nome}" adicionada aos favoritos de ${dono}`
+                : `"${nome}" removida dos favoritos de ${dono}`);
+
+        } catch (e) {
+            console.error("Erro ao favoritar/desfavoritar", e);
+            mostrarToast("Não foi possível atualizar o favorito: " + e.message, true);
+            btn.disabled = false;
+        }
+    }
+
+    async function carregarMusicas() {
+        musicas = await apiFetch("/songs");
+        renderMusicas();
+    }
+
+    userSelect.addEventListener("change", async () => {
+        salvarUsuario(userSelect.value);
+        await carregarFavoritosDoUsuario();
+        renderMusicas();
+    });
+
+    (async function iniciar() {
+        try {
+            await carregarUsuarios();
+            await carregarFavoritosDoUsuario();
+            await carregarMusicas();
+        } catch (e) {
+            console.error(e);
+            songGrid.className = "";
+            songGrid.innerHTML = `<p class="empty-list">Não foi possível carregar o catálogo: ${esc(e.message)}</p>`;
+        }
+    })();
+</script>
+
+</body>
+
+</html>

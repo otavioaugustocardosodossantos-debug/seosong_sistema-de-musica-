@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de IA - SeoSong</title>
+
+    <link rel="stylesheet" href="app.css">
+    <script src="api.js"></script>
+    <script src="app-shell.js" defer></script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="page-kicker">✨ Inteligência artificial</div>
+
+    <div class="header">
+        <h1>Central de IA</h1>
+        <p>Cinco jeitos de deixar a IA trabalhar pelo seu catálogo musical, com base no que já está cadastrado.</p>
+    </div>
+
+    <div class="tool-grid">
+
+        <!-- 1. RECOMENDAÇÕES -->
+        <div class="card tool-card">
+
+            <div class="tool-icon">🎧</div>
+            <h3>Recomendações pra você</h3>
+            <p class="tool-desc">Sugere artistas e músicas parecidas com o gosto do usuário, com base nos favoritos e nas playlists dele.</p>
+
+            <label for="rec-user">Usuário</label>
+            <select id="rec-user"></select>
+
+            <button id="rec-btn" type="button">Gerar recomendações</button>
+
+            <div id="rec-result" class="tool-result"></div>
+
+        </div>
+
+        <!-- 2. RESUMO DO PERFIL -->
+        <div class="card tool-card">
+
+            <div class="tool-icon">🪪</div>
+            <h3>Resumo do perfil musical</h3>
+            <p class="tool-desc">Um retrato curto e descontraído do gosto musical do usuário, gerado a partir dos favoritos e playlists.</p>
+
+            <label for="summary-user">Usuário</label>
+            <select id="summary-user"></select>
+
+            <button id="summary-btn" type="button">Gerar resumo</button>
+
+            <div id="summary-result" class="tool-result"></div>
+
+        </div>
+
+        <!-- 3. DESCRIÇÃO DE PLAYLIST -->
+        <div class="card tool-card">
+
+            <div class="tool-icon">📝</div>
+            <h3>Descrever uma playlist</h3>
+            <p class="tool-desc">Gera (e salva) uma descrição curta e criativa para a playlist, com base nas músicas que ela já tem.</p>
+
+            <label for="desc-playlist">Playlist</label>
+            <select id="desc-playlist"></select>
+
+            <button id="desc-btn" type="button">Gerar descrição</button>
+
+            <div id="desc-result" class="tool-result"></div>
+
+        </div>
+
+        <!-- 4. PLAYLIST POR VIBE -->
+        <div class="card tool-card">
+
+            <div class="tool-icon">🌙</div>
+            <h3>Playlist a partir de uma vibe</h3>
+            <p class="tool-desc">Descreva um humor ou momento e a IA monta uma playlist nova, escolhendo músicas que já existem no seu catálogo.</p>
+
+            <label for="vibe-user">Usuário</label>
+            <select id="vibe-user"></select>
+
+            <label for="vibe-text">Qual é a vibe?</label>
+            <input type="text" id="vibe-text" placeholder="ex: estudar à noite, road trip de verão...">
+
+            <label for="vibe-name">Nome da playlist (opcional)</label>
+            <input type="text" id="vibe-name" placeholder="deixe em branco pra gerar automático">
+
+            <button id="vibe-btn" type="button">Criar playlist</button>
+
+            <div id="vibe-result" class="tool-result"></div>
+
+        </div>
+
+        <!-- 5. DETECTAR GÊNERO -->
+        <div class="card tool-card">
+
+            <div class="tool-icon">🎼</div>
+            <h3>Detectar gênero</h3>
+            <p class="tool-desc">Preenche automaticamente o gênero de uma música que ainda não tem esse campo definido.</p>
+
+            <label for="genre-song">Música</label>
+            <select id="genre-song"></select>
+
+            <button id="genre-btn" type="button">Detectar gênero</button>
+
+            <div id="genre-result" class="tool-result"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    function showResult(el, text, type) {
+        el.textContent = text;
+        el.className = "tool-result show" + (type ? " " + type : "");
+    }
+
+    async function withLoading(button, resultEl, loadingText, action) {
+        button.disabled = true;
+        const originalLabel = button.textContent;
+        button.textContent = loadingText;
+        resultEl.innerHTML = '<span class="spinner"></span> Pensando...';
+        resultEl.className = "tool-result show loading";
+
+        try {
+            await action();
+        } catch (error) {
+            console.error(error);
+            // A mensagem vem do backend ({ "error": "..." }), ex.: chave da IA ausente, timeout etc.
+            showResult(resultEl, error.message || "Não foi possível completar essa ação.", "error");
+        } finally {
+            button.disabled = false;
+            button.textContent = originalLabel;
+        }
+    }
+
+    function fillSelect(select, items, labelFn, emptyLabel) {
+        if (!items || items.length === 0) {
+            select.innerHTML = `<option value="">${esc(emptyLabel)}</option>`;
+            select.disabled = true;
+            return;
+        }
+        select.disabled = false;
+        select.innerHTML = items.map(item => `<option value="${esc(item.id)}">${esc(labelFn(item))}</option>`).join("");
+    }
+
+    function fillPlaylists(playlists) {
+        fillSelect(
+            document.getElementById("desc-playlist"),
+            playlists,
+            p => `${p.name || "Sem nome"} (#${p.id})`,
+            "Nenhuma playlist cadastrada"
+        );
+    }
+
+    async function carregarListas() {
+
+        try {
+            const users = await apiFetch("/users");
+            const userLabel = u => `${u.name || "Sem nome"} (#${u.id})`;
+            fillSelect(document.getElementById("rec-user"), users, userLabel, "Nenhum usuário cadastrado");
+            fillSelect(document.getElementById("summary-user"), users, userLabel, "Nenhum usuário cadastrado");
+            fillSelect(document.getElementById("vibe-user"), users, userLabel, "Nenhum usuário cadastrado");
+        } catch (e) {
+            console.error("Erro ao carregar usuários", e);
+        }
+
+        try {
+            fillPlaylists(await apiFetch("/playlists"));
+        } catch (e) {
+            console.error("Erro ao carregar playlists", e);
+        }
+
+        try {
+            const songs = await apiFetch("/songs");
+            fillSelect(
+                document.getElementById("genre-song"),
+                songs,
+                s => `${s.name || "Sem nome"}${s.artist ? " - " + s.artist.name : ""}${s.genre ? " [" + s.genre + "]" : ""} (#${s.id})`,
+                "Nenhuma música cadastrada"
+            );
+        } catch (e) {
+            console.error("Erro ao carregar músicas", e);
+        }
+
+    }
+
+
+    // 1. Recomendações
+    document.getElementById("rec-btn").addEventListener("click", () => {
+        const userId = document.getElementById("rec-user").value;
+        const resultEl = document.getElementById("rec-result");
+        if (!userId) return;
+
+        withLoading(document.getElementById("rec-btn"), resultEl, "Gerando...", async () => {
+            const data = await apiFetch(`/llm/users/${userId}/recommendations`, { method: "POST" });
+            showResult(resultEl, data.recommendations);
+        });
+    });
+
+
+    // 2. Resumo do perfil
+    document.getElementById("summary-btn").addEventListener("click", () => {
+        const userId = document.getElementById("summary-user").value;
+        const resultEl = document.getElementById("summary-result");
+        if (!userId) return;
+
+        withLoading(document.getElementById("summary-btn"), resultEl, "Gerando...", async () => {
+            const data = await apiFetch(`/llm/users/${userId}/profile-summary`, { method: "POST" });
+            showResult(resultEl, data.summary);
+        });
+    });
+
+
+    // 3. Descrição de playlist
+    document.getElementById("desc-btn").addEventListener("click", () => {
+        const playlistId = document.getElementById("desc-playlist").value;
+        const resultEl = document.getElementById("desc-result");
+        if (!playlistId) return;
+
+        withLoading(document.getElementById("desc-btn"), resultEl, "Gerando...", async () => {
+            const playlist = await apiFetch(`/llm/playlists/${playlistId}/description`, { method: "POST" });
+            showResult(resultEl, playlist.description);
+        });
+    });
+
+
+    // 4. Playlist por vibe
+    document.getElementById("vibe-btn").addEventListener("click", () => {
+        const userId = document.getElementById("vibe-user").value;
+        const vibe = document.getElementById("vibe-text").value.trim();
+        const name = document.getElementById("vibe-name").value.trim();
+        const resultEl = document.getElementById("vibe-result");
+
+        if (!userId || !vibe) {
+            showResult(resultEl, "Escolha um usuário e descreva a vibe primeiro.", "error");
+            return;
+        }
+
+        withLoading(document.getElementById("vibe-btn"), resultEl, "Criando...", async () => {
+            const playlist = await apiSend("/llm/vibe-playlist", "POST", {
+                userId: Number(userId),
+                vibe,
+                name: name || undefined
+            });
+
+            const songsArr = playlist.songs || [];
+            const songNames = songsArr.map(s => s.name).join(", ");
+
+            showResult(
+                resultEl,
+                `"${playlist.name}" criada com ${songsArr.length} música(s): ${songNames}\n\n${playlist.description || ""}`
+            );
+
+            document.getElementById("vibe-text").value = "";
+            document.getElementById("vibe-name").value = "";
+
+            // atualiza a lista de playlists da outra ferramenta
+            try {
+                fillPlaylists(await apiFetch("/playlists"));
+            } catch (e) {
+                console.error("Erro ao recarregar playlists", e);
+            }
+        });
+    });
+
+
+    // 5. Detectar gênero
+    document.getElementById("genre-btn").addEventListener("click", () => {
+        const songId = document.getElementById("genre-song").value;
+        const resultEl = document.getElementById("genre-result");
+        if (!songId) return;
+
+        withLoading(document.getElementById("genre-btn"), resultEl, "Detectando...", async () => {
+            const song = await apiFetch(`/llm/songs/${songId}/detect-genre`, { method: "POST" });
+            showResult(resultEl, `Gênero de "${song.name}": ${song.genre}`);
+        });
+    });
+
+
+    carregarListas();
+</script>
+
+</body>
+
+</html>
