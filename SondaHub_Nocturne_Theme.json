@@ -1,0 +1,55 @@
+{
+  "name": "Sonda Hub | Nocturne Editorial",
+  "dataColors": [
+    "#1AAE9B",
+    "#3D76A8",
+    "#E5A54C",
+    "#9C83CB",
+    "#E27D6A",
+    "#5F9D8F",
+    "#C66F8A",
+    "#799AC8"
+  ],
+  "background": "#071827",
+  "foreground": "#F4F7F8",
+  "tableAccent": "#1AAE9B",
+  "firstLevelElements": "#DCE7EC",
+  "secondLevelElements": "#A9BBC6",
+  "thirdLevelElements": "#2A465A",
+  "fourthLevelElements": "#7892A4",
+  "good": "#1AAE9B",
+  "neutral": "#E5A54C",
+  "bad": "#E27D6A",
+  "textClasses": {
+    "callout": {
+      "fontFace": "Aptos Display Semibold",
+      "fontSize": 30,
+      "color": "#F4F7F8"
+    },
+    "title": {
+      "fontFace": "Aptos Display Semibold",
+      "fontSize": 13,
+      "color": "#F4F7F8"
+    },
+    "header": {
+      "fontFace": "Aptos Display Semibold",
+      "fontSize": 11,
+      "color": "#142E40"
+    },
+    "label": {
+      "fontFace": "Aptos",
+      "fontSize": 9,
+      "color": "#506777"
+    },
+    "boldLabel": {
+      "fontFace": "Aptos Display Semibold",
+      "fontSize": 10,
+      "color": "#142E40"
+    },
+    "lightLabel": {
+      "fontFace": "Aptos",
+      "fontSize": 9,
+      "color": "#8CA2B2"
+    }
+  }
+}
